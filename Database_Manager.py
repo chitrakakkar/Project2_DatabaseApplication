@@ -21,17 +21,39 @@ class dataBase_manaGer:
         row = cur.fetchone()
         if row:
             return Employee(row[0], row[1], row[2], row[3])
-        return None
+        else:
+            return None
 
-    def get_payScale(self, employee_id):
+    def get_payScale(self, grade_id):
         cur = self.conn.cursor()
         query = 'SELECT ROWID, * FROM PayScale WHERE ROWID = ?  '
-        cur.execute(query, (employee_id,))
+        cur.execute(query, (grade_id,))
         row = cur.fetchone()
         if row:
             return PayScale(row[0], row[1])
-        return None
+        else:
+            return None
 
+    def get_employee_Id_list(self):
+        employee_Id_list =[]
+        cur = self.conn.cursor()
+        query = 'SELECT ROWID FROM Employee'
+        cur.execute(query)
+        for row in cur.fetchall():
+            employee_id = row[0]
+            employee_Id_list.append(self.get_employee(employee_id).id)
+        return employee_Id_list
+
+
+    # def get_all_employee_list(self):
+    #     employee_list =[]
+    #     cur = self.conn.cursor()
+    #     query = 'SELECT ROWID, * FROM Employee '
+    #     cur.execute(query)
+    #     for row in cur.fetchall():
+    #         employee_id = row[1]
+    #         employee_list.append(self.get_employee(employee_id))
+    #     return employee_list
 
 
     def add_employee(self, first_name, last_name, grade):
@@ -40,6 +62,8 @@ class dataBase_manaGer:
         query = 'INSERT INTO Employee VALUES(?,?,?) '
         cur.execute(query, (first_name, last_name, grade))
         self.conn.commit()
+
+
 
     def delete_employee(self,employee_id):
         """ Deletes employee from the employee """
@@ -56,3 +80,4 @@ class dataBase_manaGer:
                 'WHERE employee_id = ? '
         cur.execute(query,(employee_id, newGrade))
         self.conn.commit()
+
