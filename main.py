@@ -1,9 +1,19 @@
+"""
+This class deals with the user interface and error checking of the input data
+gives couple of menu options and define each option to perform an action.
+"""
+
+
 from Database_Manager import dataBase_manaGer
 from Tables_Entity import SalarySlip
 db = dataBase_manaGer('Employee.db')
 
 
 def HR_Options(employee, payScale):
+    """
+        Display menu for user, checks if the user input is an integer and does
+        action basis option chosen.
+        """
     menu = (
 
         '\nOptions\n'
@@ -27,7 +37,7 @@ def HR_Options(employee, payScale):
         elif Option_choice == 4:
             update_employee(employee)
         elif Option_choice ==5:
-            Time_Sheet(employee,payScale)
+            emp_salary_slip(employee,payScale)
         elif Option_choice == 6:
             exit(0);
         else:
@@ -37,6 +47,10 @@ def HR_Options(employee, payScale):
 
 
 def get_employee(employee):
+
+    """Gets the employee data from the Employee table with id
+     and format done for printing the data"""
+
     employee_id = get_employee_input_int('Enter employee ID to get the data ')
     employee = db.get_employee(employee_id)
     if not employee:
@@ -48,6 +62,8 @@ def get_employee(employee):
 
 
 def add_employee(employee):
+    """ Adds a new employee to the employee table"""
+
     while True:
         first_name = get_user_string("Enter your first name")
         last_name = get_user_string("Enter your last name")
@@ -65,6 +81,7 @@ def add_employee(employee):
 
 
 def delete_employee(employee):
+    """ Delete an existing employee from the employee table"""
     employee_Id_list = db.get_employee_Id_list()
     print("The current employee list is " , employee_Id_list)
     while True:
@@ -80,13 +97,15 @@ def delete_employee(employee):
 
 
 def update_employee(employee):
+    """ Updates the grade for an existing employee to the employee table"""
     employee_id = get_employee_input_int("Enter the employee id you want to update")
     newGrade = get_employee_input_int("Enter the new grade for ", employee_id)
     db.update_employee(employee_id, newGrade)
     print(employee.full_name + "'s grade value has been update to :-> ", newGrade)
 
 
-def Time_Sheet(employee,payscale):
+def emp_salary_slip(employee,payscale):
+    """ Shows the Salary _Slip for the employee"""
     emp_id = get_employee_input_int("Enter your employee ID")
     week_Number = get_employee_input_int("Enter the week number")
     hours = get_employee_hours_Float("Enter your hours for the week")
@@ -115,6 +134,7 @@ def get_user_string(message):
 
 
 def get_employee_input_int(message):
+    """ Returns an integer from the user , else an error prompt"""
     while True:
         user_input = input('{}: '.format(message))
 
@@ -136,6 +156,7 @@ def get_employee_input_int(message):
 
 
 def get_employee_hours_Float(message):
+    """ Returns a float number, else an error message"""
     while True:
         user_input = input('{}: '.format(message))
 
@@ -158,6 +179,7 @@ def get_employee_hours_Float(message):
 
 
 def main():
+    """ shows the default test data and calls the menu function if all ok"""
     while True:
         employee_id = get_employee_input_int('TEST DATA: Enter employee ID to look up for the data ')
         employee = db.get_employee(employee_id)
