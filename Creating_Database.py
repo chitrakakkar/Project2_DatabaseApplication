@@ -1,3 +1,6 @@
+"""Run a SQL script where a set of commands are saved in a
+        # file/string/script creates tables and inserts value to set up the database."""
+
 import sqlite3
 
 sql_script = '''

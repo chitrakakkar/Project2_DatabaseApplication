@@ -14,7 +14,6 @@ class Employee:
 
 
 class PayScale:
-
     def __init__(self, grade, salary):
         self.grade = grade
         self.salary = salary
@@ -48,6 +47,7 @@ class SalarySlip:
         self.Hours = Hours
 
     def get_Total_Salary(hours, salary):
+        """ Calculates the total salary for an employee"""
         Total_Salary = hours * salary
         return Total_Salary
 
