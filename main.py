@@ -1,40 +1,60 @@
 from Database_Manager import dataBase_manaGer
-
+from Tables_Entity import SalarySlip
 db = dataBase_manaGer('Employee.db')
 
 
-def HR_Options(employee):
+def HR_Options(employee, payScale):
     menu = (
 
         '\nOptions\n'
-        '\t1)Add Employee\n'
-        '\t2)Delete Employee\n'
-        '\t3)Update Employee\n'
-        '\t4)Quit\n'
+        '\t1)Get Employee\n'
+        '\t2)Add Employee\n'
+        '\t3)Delete Employee\n'
+        '\t4)Update Employee Grade\n'
+        '\t5)Time-Sheet\n'
+        '\t6)Quit\n'
         'Choose from above mentioned options'
     )
 
     while True:
-        Option_choice = get_employee_id_int(menu, None)
-
+        Option_choice = get_employee_input_int(menu)
         if Option_choice == 1:
-            add_employee(employee)
+            get_employee(employee)
         elif Option_choice == 2:
-            delete_employee(employee)
+            add_employee(employee)
         elif Option_choice == 3:
+            delete_employee(employee)
+        elif Option_choice == 4:
             update_employee(employee)
-        else:
+        elif Option_choice ==5:
+            Time_Sheet(employee,payScale)
+        elif Option_choice == 6:
             exit(0);
+        else:
+            print("Invalid Entry !!! Please choose Option between (1-6)")
+            continue
+    return
+
+
+def get_employee(employee):
+    employee_id = get_employee_input_int('Enter employee ID to get the data ')
+    employee = db.get_employee(employee_id)
+    if not employee:
+        print("No employee found with id ", employee_id)
+    else:
+        payscale = db.get_payScale(employee.grade)
+        print('DATA:-> {} {} has grade = {} which gives {} per hours\n'
+              .format(employee.first_name, employee.last_name, employee.grade, payscale.salary))
 
 
 def add_employee(employee):
     while True:
         first_name = get_user_string("Enter your first name")
         last_name = get_user_string("Enter your last name")
-        grade = get_employee_id_int("Enter your grade", range(1,7))
+        grade = get_employee_input_int("Enter your grade", range(1,7))
         db.add_employee(first_name, last_name, grade)
-        print("New employee " + first_name +"\t" + last_name + " has been added to the employee table")
-        user_input=input("Do you want to add more employees to the table ? (Y/N)")
+        print("New employee " + first_name + "" + last_name + " has been added to the employee table")
+        user_input = input("Do you want to add more employees to the table ? (Y/N)")
         if(str(user_input).upper()) == 'Y':
             continue
         elif (str(user_input).upper()) == 'N':
@@ -59,13 +79,22 @@ def delete_employee(employee):
             continue
 
 
-
-
 def update_employee(employee):
-    employee_id = get_employee_id_int("Enter the employee id you want to update")
-    newGrade = (get_employee_id_int("Enter the new grade for " + employee_id))
+    employee_id = get_employee_input_int("Enter the employee id you want to update")
+    newGrade = get_employee_input_int("Enter the new grade for ", employee_id)
     db.update_employee(employee_id, newGrade)
-    print(employee_id + " grade value has been update to " + newGrade)
+    print(employee.full_name + "'s grade value has been update to :-> ", newGrade)
+
+
+def Time_Sheet(employee,payscale):
+    emp_id = get_employee_input_int("Enter your employee ID")
+    week_Number = get_employee_input_int("Enter the week number")
+    hours = get_employee_hours_Float("Enter your hours for the week")
+    Total_salary = SalarySlip.get_Total_Salary(hours, payscale.salary)
+    db.get_TimeSheet(emp_id, hours, week_Number, Total_salary)
+    print('Employee:-> {} has a Grade = {} | Salary Slip :-> week {} |\n'
+          'Total Working hours-> {} | Pay/hours -> {} | Total-Salary for this week {}'
+          .format(db.get_employee(emp_id).full_name, employee.grade, week_Number, hours, payscale.salary, round(Total_salary, 2)))
 
 
 def get_user_string(message):
@@ -85,38 +114,61 @@ def get_user_string(message):
             print('You must enter something.')
 
 
-def get_employee_id_int(message, valid_range=None):
+def get_employee_input_int(message):
     while True:
         user_input = input('{}: '.format(message))
 
         # Type validation
         try:
             number = int(user_input)
+            break
         except ValueError:
             print('You must enter a whole number.')
             continue
 
         #Range Validation
-        if valid_range and number not in valid_range:
-            _min = min(valid_range)
-            _max = max(valid_range)
-            print('You must enter a number from {} to {}.'.format(_min, _max))
+        # if valid_range and number not in valid_range:
+        #     _min = min(valid_range)
+        #     _max = max(valid_range)
+        #     print('You must enter a number from {} to {}.'.format(_min, _max))
+        #     continue
+    return number
+
+
+def get_employee_hours_Float(message):
+    while True:
+        user_input = input('{}: '.format(message))
+
+        # Type validation
+        try:
+            number = float(user_input)
+            print("You entered this hour ", number)
+            break
+        except ValueError:
+            print('You must enter a Float number.')
             continue
-        return number
+
+        #Range Validation
+        # if valid_range and number not in valid_range:
+        #     _min = min(valid_range)
+        #     _max = max(valid_range)
+        #     print('You must enter a number from {} to {}.'.format(_min, _max))
+        #     continue
+    return number
 
 
 def main():
     while True:
-        employee_id = get_employee_id_int('Enter employee ID to look up the data ')
+        employee_id = get_employee_input_int('TEST DATA: Enter employee ID to look up for the data ')
         employee = db.get_employee(employee_id)
         if not employee:
             print("No employee found with id ", employee_id)
 
         else:
             payscale = db.get_payScale(employee.grade)
-            print('DATA:-> {} {} has grade = {} which gives {} per hours\n'
-                  .format(employee.first_name, employee.last_name, employee.grade, payscale.salary))
-            HR_Options(employee)
+            print('DATA:-> {} has a grade = {}, Hence gets {} per hours\n'
+                  .format(employee.full_name,employee.grade, payscale.salary))
+            HR_Options(employee, payscale)
             break
 
 main()
