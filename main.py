@@ -67,7 +67,7 @@ def add_employee(employee):
     while True:
         first_name = get_user_string("Enter your first name")
         last_name = get_user_string("Enter your last name")
-        grade = get_employee_input_int("Enter your grade", range(1,7))
+        grade = get_employee_input_int("Enter your grade")
         db.add_employee(first_name, last_name, grade)
         print("New employee " + first_name + "" + last_name + " has been added to the employee table")
         user_input = input("Do you want to add more employees to the table ? (Y/N)")
@@ -99,9 +99,9 @@ def delete_employee(employee):
 def update_employee(employee):
     """ Updates the grade for an existing employee to the employee table"""
     employee_id = get_employee_input_int("Enter the employee id you want to update")
-    newGrade = get_employee_input_int("Enter the new grade for ", employee_id)
+    newGrade = get_employee_input_int("Enter the new grade for ")
     db.update_employee(employee_id, newGrade)
-    print(employee.full_name + "'s grade value has been update to :-> ", newGrade)
+    print(employee.full_name + "'s grade value has been updated to :-> ", newGrade)
 
 
 def emp_salary_slip(employee,payscale):
