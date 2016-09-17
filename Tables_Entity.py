@@ -41,9 +41,8 @@ class PayScale:
 
 class SalarySlip:
 
-    def __init__(self, employee_id, week, Hours):
+    def __init__(self, employee_id, Hours):
         self.employee_id = employee_id
-        self.week = week
         self.Hours = Hours
 
     def get_Total_Salary(hours, salary):

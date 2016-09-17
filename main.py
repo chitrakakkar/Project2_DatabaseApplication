@@ -21,24 +21,30 @@ def HR_Options(employee, payScale):
         '\t2)Add Employee\n'
         '\t3)Delete Employee\n'
         '\t4)Update Employee Grade\n'
-        '\t5)Time-Sheet\n'
-        '\t6)Quit\n'
+        '\t5)Time-Sheet'
+        '\t6)Salary_SLip\n'
+        '\t7)Get All Employee'
+        '\t8)Quit\n'
         'Choose from above mentioned options'
     )
 
     while True:
         Option_choice = get_employee_input_int(menu)
         if Option_choice == 1:
-            get_employee(employee)
+            get_employee()
         elif Option_choice == 2:
-            add_employee(employee)
+            add_employee()
         elif Option_choice == 3:
-            delete_employee(employee)
+            delete_employee()
         elif Option_choice == 4:
             update_employee(employee)
-        elif Option_choice ==5:
-            emp_salary_slip(employee,payScale)
+        elif Option_choice == 5:
+            enter_time_sheet()
         elif Option_choice == 6:
+            emp_salary_slip(payScale)
+        elif Option_choice ==7:
+            get_all_employee()
+        elif Option_choice == 8:
             exit(0);
         else:
             print("Invalid Entry !!! Please choose Option between (1-6)")
@@ -46,7 +52,7 @@ def HR_Options(employee, payScale):
     return
 
 
-def get_employee(employee):
+def get_employee():
 
     """Gets the employee data from the Employee table with id
      and format done for printing the data"""
@@ -61,15 +67,15 @@ def get_employee(employee):
               .format(employee.first_name, employee.last_name, employee.grade, payscale.salary))
 
 
-def add_employee(employee):
+def add_employee():
     """ Adds a new employee to the employee table"""
 
     while True:
         first_name = get_user_string("Enter your first name")
         last_name = get_user_string("Enter your last name")
-        grade = get_employee_input_int("Enter your grade", range(1,7))
+        grade = get_employee_input_int("Enter your grade")
         db.add_employee(first_name, last_name, grade)
-        print("New employee " + first_name + "" + last_name + " has been added to the employee table")
+        print("New employee " + first_name + " " + last_name + " has been added to the employee table")
         user_input = input("Do you want to add more employees to the table ? (Y/N)")
         if(str(user_input).upper()) == 'Y':
             continue
@@ -80,7 +86,7 @@ def add_employee(employee):
             break
 
 
-def delete_employee(employee):
+def delete_employee():
     """ Delete an existing employee from the employee table"""
     employee_Id_list = db.get_employee_Id_list()
     print("The current employee list is " , employee_Id_list)
@@ -96,24 +102,39 @@ def delete_employee(employee):
             continue
 
 
+def get_all_employee():
+    employee = db.get_all_employee();
+    print('Employee list: \n '
+          '{} {} {}'.format(employee.id, employee.full_name, employee.grade)+ '\n')
+
+
 def update_employee(employee):
     """ Updates the grade for an existing employee to the employee table"""
     employee_id = get_employee_input_int("Enter the employee id you want to update")
-    newGrade = get_employee_input_int("Enter the new grade for ", employee_id)
+    newGrade = get_employee_input_int("Enter the new grade for ")
     db.update_employee(employee_id, newGrade)
-    print(employee.full_name + "'s grade value has been update to :-> ", newGrade)
+    print(employee.full_name + "'s grade value has been updated to :-> ", newGrade)
 
 
-def emp_salary_slip(employee,payscale):
-    """ Shows the Salary _Slip for the employee"""
+def enter_time_sheet():
+    employee_id = get_employee_input_int("Enter the employee id to enter the working hours for")
+    date_timesheet = get_user_string("Enter the date you want to enter the hours for")
+    employee_hours = get_employee_hours_Float("enter the working hours for " + date_timesheet)
+    db.Insert_TimeSheet(employee_id, employee_hours, date_timesheet)
+    print(employee_id + "'s new hours for the date : " + date_timesheet + "has been added to the table")
+
+
+def emp_salary_slip(payscale):
     emp_id = get_employee_input_int("Enter your employee ID")
-    week_Number = get_employee_input_int("Enter the week number")
-    hours = get_employee_hours_Float("Enter your hours for the week")
-    Total_salary = SalarySlip.get_Total_Salary(hours, payscale.salary)
-    db.get_TimeSheet(emp_id, hours, week_Number, Total_salary)
-    print('Employee:-> {} has a Grade = {} | Salary Slip :-> week {} |\n'
+    start_date = get_user_string("Enter the start date")
+    end_date = get_user_string("Enter the end date")
+    total_hours = db.get_total_working_hours(emp_id, start_date, end_date)
+    total_salary = SalarySlip.get_Total_Salary(total_hours, payscale.salary)
+    print('Employee:-> {} has a Grade = {} | Salary Slip for the duration:-> {}{} '
           'Total Working hours-> {} | Pay/hours -> {} | Total-Salary for this week {}'
-          .format(db.get_employee(emp_id).full_name, employee.grade, week_Number, hours, payscale.salary, round(Total_salary, 2)))
+          .format(db.get_employee(emp_id).full_name, db.get_employee(emp_id).grade, start_date, end_date, total_hours,
+                  db.get_payScale(emp_id).salary, round(total_salary, 2))
+          )
 
 
 def get_user_string(message):
@@ -189,7 +210,7 @@ def main():
         else:
             payscale = db.get_payScale(employee.grade)
             print('DATA:-> {} has a grade = {}, Hence gets {} per hours\n'
-                  .format(employee.full_name,employee.grade, payscale.salary))
+                  .format(employee.full_name, employee.grade, payscale.salary))
             HR_Options(employee, payscale)
             break
 

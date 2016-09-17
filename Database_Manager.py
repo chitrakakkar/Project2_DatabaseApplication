@@ -3,7 +3,7 @@ This class sets up the database and creates required tables.  It also deals with
 different methods to get data from the data base using queries.
 """
 import sqlite3
-from Tables_Entity import Employee, PayScale
+from Tables_Entity import Employee, PayScale, SalarySlip
 
 
 class dataBase_manaGer:
@@ -11,6 +11,23 @@ class dataBase_manaGer:
     def __init__(self, filename):
         """Set up the connection to the database."""
         self.conn = sqlite3.connect(filename)
+
+    def get_all_employee(self):
+        try:
+            cur = self.conn.cursor()
+            query = 'SELECT ROWID,  * FROM Employee'
+            cur.execute(query)
+            self.conn.commit()
+            row = cur.fetchall()
+            if row:
+                return Employee(row[0], row[1], row[2], row[3])
+            else:
+                return None
+
+        except sqlite3.OperationalError as oe:
+            print('Sql execution error', oe)
+        except sqlite3.Error as e:
+            print("Connection error ", e)
 
     def get_employee(self, employee_id):
 
@@ -23,7 +40,7 @@ class dataBase_manaGer:
             # a single item tuple.  Another way to do it would be to pass in
             # tuple(student)
             cur.execute(query, (employee_id,))
-
+            self.conn.commit()
             row = cur.fetchone()
             if row:
                 return Employee(row[0], row[1], row[2], row[3])
@@ -104,14 +121,32 @@ class dataBase_manaGer:
         except sqlite3.Error as e:
             print("Connection error ", e)
 
-    def get_TimeSheet(self, employee_id, week_Number, Hours, Total_Salary):
+    def Insert_TimeSheet(self, employee_id, Hours, TimeSheet_Date):
         """ Gets you the weekly salary for an employee"""
         try:
             cur = self.conn.cursor()
-            query = 'INSERT INTO Salary_Slip(Employee_ROWID, Hours, Week, Total_Salary) VALUES ' \
-                    '(?,?,?,?)'
-            cur.execute(query, (employee_id, Hours, week_Number, Total_Salary))
+            query = 'INSERT INTO Time_Sheet(Employee_ROWID,HOUR, Date) VALUES ' \
+                    '(?,?,?)'
+            cur.execute(query, (employee_id, Hours, TimeSheet_Date))
             self.conn.commit()
+        except sqlite3.OperationalError as oe:
+            print('Sql execution error', oe)
+        except sqlite3.Error as e:
+            print("Connection error ", e)
+
+    def get_total_working_hours(self, employee_id, start_date, end_date):
+        """Gets you the total working hours for an employee
+         for a given date range"""
+        try:
+            cur = self.conn.cursor()
+            query = 'SELECT SUM(Hours)Total_Hours FROM Time_Sheet WHERE EmpLoyee_ROWID = ?' \
+                    'AND ' \
+                    'Date BETWEEN ? AND ?'
+            cur.execute(query, (employee_id, start_date, end_date))
+            self.conn.commit()
+            row = cur.fetchone()
+            total_hours = row[0]
+            return total_hours
         except sqlite3.OperationalError as oe:
             print('Sql execution error', oe)
         except sqlite3.Error as e:
