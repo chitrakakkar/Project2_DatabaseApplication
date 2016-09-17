@@ -121,7 +121,7 @@ def enter_time_sheet():
     date_timesheet = get_user_string("Enter the date you want to enter the hours for")
     employee_hours = get_employee_hours_Float("enter the working hours for " + date_timesheet)
     db.Insert_TimeSheet(employee_id, employee_hours, date_timesheet)
-    print(employee_id + "'s new hours for the date : " + date_timesheet + "has been added to the table")
+    print(db.get_employee(employee_id).full_name, "'s new hours for the date : " + date_timesheet + " has been added")
 
 
 def emp_salary_slip(payscale):
@@ -130,7 +130,7 @@ def emp_salary_slip(payscale):
     end_date = get_user_string("Enter the end date")
     total_hours = db.get_total_working_hours(emp_id, start_date, end_date)
     total_salary = SalarySlip.get_Total_Salary(total_hours, payscale.salary)
-    print('Employee:-> {} has a Grade = {} | Salary Slip for the duration:-> {}{} '
+    print('Employee:-> {} has a Grade = {} | Salary Slip for the duration:-> {}-{} '
           'Total Working hours-> {} | Pay/hours -> {} | Total-Salary for this week {}'
           .format(db.get_employee(emp_id).full_name, db.get_employee(emp_id).grade, start_date, end_date, total_hours,
                   db.get_payScale(emp_id).salary, round(total_salary, 2))
