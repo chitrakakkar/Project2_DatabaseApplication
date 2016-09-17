@@ -167,12 +167,6 @@ def get_employee_input_int(message):
             print('You must enter a whole number.')
             continue
 
-        #Range Validation
-        # if valid_range and number not in valid_range:
-        #     _min = min(valid_range)
-        #     _max = max(valid_range)
-        #     print('You must enter a number from {} to {}.'.format(_min, _max))
-        #     continue
     return number
 
 
@@ -189,13 +183,6 @@ def get_employee_hours_Float(message):
         except ValueError:
             print('You must enter a Float number.')
             continue
-
-        #Range Validation
-        # if valid_range and number not in valid_range:
-        #     _min = min(valid_range)
-        #     _max = max(valid_range)
-        #     print('You must enter a number from {} to {}.'.format(_min, _max))
-        #     continue
     return number
 
 
